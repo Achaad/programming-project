@@ -3,6 +3,18 @@ from tkinter import ttk
 from tkinter import messagebox
 from tkinter.filedialog import askopenfiles
 
+################################################################################
+################################################################################
+
+# Global variables
+global files
+global nimekiri
+nimekiri = []
+
+
+################################################################################
+################################################################################
+
 
 # Placeholder function
 # TODO: remove this function
@@ -35,17 +47,69 @@ def tudengite_nimekiri(csv_files):
 
 
 def student_singleWork():
+
+    global nimekiri
+    global files
+
+    def onFrameConfigure(canvas):
+        '''Reset the scroll region to encompass the inner frame'''
+        canvas.configure(scrollregion=canvas.bbox("all"))
+
+    # TODO: check if nimekiri is not already filled
+    nimekiri = tudengite_nimekiri(files)
+
+    student_chooser = Tk()
+    student_chooser.title("Choose a student.")
+
+    scroll = Scrollbar(student_chooser)
+
+    options = Listbox(student_chooser, yscrollcommand=scroll.set)
+    scroll.config(command=options.yview)
+
+    for nimi in nimekiri:
+        options.insert(END, nimi)
+
+    options.pack(side=LEFT, fill=BOTH, expand=1)
+    scroll.pack(side=LEFT,fill=Y)
+
+
+    
+
+    """
+    options = Frame(student_chooser)
+    canvas = Canvas(student_chooser)
+
+    var = StringVar()
+
+    radiobuttons = []
+    radio_row = 1
+    
+    for nimi in nimekiri:
+        _Radio = Radiobutton(master=options, text=nimi,
+                             variable=var, value=nimi
+                             )
+        _Radio.pack()
+        radio_row += 1
+
+        radiobuttons.append(_Radio)
+    
+
+    vsb = Scrollbar(student_chooser, orient="vertical", command=canvas.yview)
+    canvas.configure(yscrollcommand=vsb.set)
+
+    vsb.grid(column = 2, fill="y")
+    canvas.grid(column=1,)
+    canvas.create_window((4, 4), window=options, anchor="nw")
+
+    options.bind("<Configure>",
+               lambda event, canvas=canvas: onFrameConfigure(canvas)
+                 )
+
+    """
+
+    student_chooser.mainloop()
     return None
 
-
-
-
-################################################################################
-################################################################################
-
-# Global variables
-global files
-global nimekiri
 
 
 ################################################################################
@@ -73,7 +137,9 @@ statistics_menu = Menu(main_menu)
 
 # Loome student-menu
 student_menu = Menu(statistics_menu)
-student_menu.add_command(label="Single work", command=donothing)
+student_menu.add_command(label="Single work",
+                         command=student_singleWork
+                         )
 student_menu.add_command(label="Semester", command=donothing)
 
 statistics_menu.add_cascade(label="Student", menu=student_menu)
