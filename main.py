@@ -2,6 +2,9 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter.filedialog import askopenfiles
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
 
 ################################################################################
 ################################################################################
@@ -44,12 +47,15 @@ def tudengite_nimekiri(csv_files):
             osad = rida.strip().split(",")
             if osad[0] not in nimekiri:
                 nimekiri.append(osad[0])
+        file.seek(0)
     return nimekiri
 
 
 def plot_singlework_student(nimi):
     return None
 
+
+# Tagastab listi, kus on erinevate tööde nimetused
 def tööde_nimed(csv_files):
     global tööd
     tööd = []
@@ -60,8 +66,7 @@ def tööde_nimed(csv_files):
             tööd.append(töönimi.split(".")[0])
     return tööd
 
-def plot_work(inimese_nimi, töönimi):
-    print(inimese_nimi, töönimi)
+
 
 def student_singleWork():
 
@@ -70,6 +75,36 @@ def student_singleWork():
     global tööd
     global plot_work
 
+    def plot_work(inimese_nimi, töönimi):
+        global files
+
+        # TODO: remove print when finished
+        print(inimese_nimi, töönimi)
+        suurused = []
+        numbrid = []
+
+        # Saame kätte suurused graafiku joonistamiseks
+        for f in files:
+            if töönimi in f.name:
+                for rida in f:
+                    osad = rida.strip().split(",")
+                    if inimese_nimi == osad[0]:
+                        for i in range(len(osad)):
+                            if i > 1:
+                                suurused.append(float(osad[i]))
+                                numbrid.append(i - 1)
+                f.seek(
+                    0)  # Tagastab faili algusele, et seda saaks kasutada uuesti
+
+        print(suurused)
+        print(numbrid)
+
+        ax.clear()
+        ax.bar(numbrid, suurused)
+        ax.set_xticks(numbrid)
+
+        canvas.show()
+        student_chooser.destroy()
 
     def get_student_name():
         valitud_nimi = nimekiri[options.curselection()[0]]
@@ -81,10 +116,6 @@ def student_singleWork():
                                                         tööd[options.curselection()[0]]))
 
 
-    def get_name(options):
-        global nimekiri
-        number = options.curselection()
-        nimi = nimekiri[number]
 
     # TODO: check if nimekiri is not already filled
     nimekiri = tudengite_nimekiri(files)
@@ -94,6 +125,7 @@ def student_singleWork():
 
     student_chooser = Tk()
     student_chooser.title("Choose a student.")
+
 
     scroll = Scrollbar(student_chooser)
 
@@ -172,6 +204,16 @@ message_menu = Menu(main_menu)
 message_menu.add_command(label="Send message", command=donothing)
 
 main_menu.add_cascade(label="Message", menu=message_menu)
+
+# Loon graafikut tähistavad objektid
+fig = Figure(figsize=(5, 5), dpi=100) # 5x5 tolli
+ax = fig.add_subplot(1,1,1)
+fig.set_facecolor('white')
+
+# Loon pinna graafiku joonistamiseks
+# ja paigutan vastava Tk vidina
+canvas = FigureCanvasTkAgg(fig, master=main_window)
+canvas.get_tk_widget().grid(row=0, column=0, columnspan=2)
 
 
 main_window.config(menu=main_menu)
