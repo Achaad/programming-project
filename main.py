@@ -10,6 +10,7 @@ from tkinter.filedialog import askopenfiles
 global files
 global nimekiri
 nimekiri = []
+tööd = []
 
 
 ################################################################################
@@ -46,17 +47,50 @@ def tudengite_nimekiri(csv_files):
     return nimekiri
 
 
+def plot_singlework_student(nimi):
+    return None
+
+def tööde_nimed(csv_files):
+    global tööd
+    tööd = []
+    for e in csv_files:
+        failinimi = e.name
+        töönimi = failinimi.split("_")[1]
+        if "semester" not in töönimi:
+            tööd.append(töönimi.split(".")[0])
+    return tööd
+
+def plot_work(inimese_nimi, töönimi):
+    print(inimese_nimi, töönimi)
+
 def student_singleWork():
 
     global nimekiri
     global files
+    global tööd
+    global plot_work
 
-    def onFrameConfigure(canvas):
-        '''Reset the scroll region to encompass the inner frame'''
-        canvas.configure(scrollregion=canvas.bbox("all"))
+
+    def get_student_name():
+        valitud_nimi = nimekiri[options.curselection()[0]]
+        options.delete(0, END)
+        student_chooser.title("Choose a work.")
+        for nimi in tööd:
+            options.insert(END, nimi)
+        select_name.configure(command=lambda: plot_work(valitud_nimi,
+                                                        tööd[options.curselection()[0]]))
+
+
+    def get_name(options):
+        global nimekiri
+        number = options.curselection()
+        nimi = nimekiri[number]
 
     # TODO: check if nimekiri is not already filled
     nimekiri = tudengite_nimekiri(files)
+
+    #TODO: check if tööd is not already filled
+    tööd = tööde_nimed(files)
 
     student_chooser = Tk()
     student_chooser.title("Choose a student.")
@@ -72,40 +106,11 @@ def student_singleWork():
     options.pack(side=LEFT, fill=BOTH, expand=1)
     scroll.pack(side=LEFT,fill=Y)
 
+    select_name = Button(student_chooser, text="OK",
+                         command=get_student_name
+                        )
+    select_name.pack(fill=Y)
 
-    
-
-    """
-    options = Frame(student_chooser)
-    canvas = Canvas(student_chooser)
-
-    var = StringVar()
-
-    radiobuttons = []
-    radio_row = 1
-    
-    for nimi in nimekiri:
-        _Radio = Radiobutton(master=options, text=nimi,
-                             variable=var, value=nimi
-                             )
-        _Radio.pack()
-        radio_row += 1
-
-        radiobuttons.append(_Radio)
-    
-
-    vsb = Scrollbar(student_chooser, orient="vertical", command=canvas.yview)
-    canvas.configure(yscrollcommand=vsb.set)
-
-    vsb.grid(column = 2, fill="y")
-    canvas.grid(column=1,)
-    canvas.create_window((4, 4), window=options, anchor="nw")
-
-    options.bind("<Configure>",
-               lambda event, canvas=canvas: onFrameConfigure(canvas)
-                 )
-
-    """
 
     student_chooser.mainloop()
     return None
