@@ -3,7 +3,9 @@ from tkinter import messagebox
 from tkinter.filedialog import askopenfiles
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
+from matplotlib.pyplot import grid
 import numpy
+import webbrowser
 
 
 ################################################################################
@@ -16,17 +18,8 @@ nimekiri = []
 tööd = []
 
 
-#TODO: check if student has not done work
-#TODO: change yscale
-
 ################################################################################
 ################################################################################
-
-# Placeholder function
-# TODO: remove this function
-def donothing():
-    return None
-
 
 # Küsib kasutajalt .csv failid, avab neid ja tagastab nende objektid listina
 # Lisaks täidab tööde ja nimede listi
@@ -107,14 +100,18 @@ def student_singleWork():
                 f.seek(
                     0)  # Tagastab faili algusele, et seda saaks kasutada uuesti
 
-        print(suurused)
-        print(numbrid)
+        for i in range(len(suurused)):
+            suurused[i] = float(suurused[i])
 
         ax.clear()
         ax.bar(numbrid, suurused)
         ax.set_xticks(numbrid)
         ax.set_xlabel("Ülesanned")
         ax.set_ylabel("Ballid")
+        ax.set_yticks(numpy.arange(0, max(suurused) + 0.1, 0.1))
+        ax.grid(b=True)
+        ax.set_axisbelow(True)
+
         graafiku_nimi = inimese_nimi + ", " + töönimi
         ax.set_title(graafiku_nimi)
 
@@ -191,14 +188,14 @@ def student_semester():
                 f.seek(
                     0)  # Tagastab faili algusele, et seda saaks kasutada uuesti
 
-        print(suurused)
-        print(numbrid)
-
         ax.clear()
         ax.plot(numbrid, suurused, "o-")
         ax.set_xticks(numbrid)
         ax.set_xlabel("Tööd")
         ax.set_ylabel("Ballid")
+        ax.set_yticks(numpy.arange(0, max(suurused), 1), minor=True)
+        ax.grid(b=True)
+        ax.set_axisbelow(True)
 
         graafiku_nimi = inimese_nimi + ", semester"
         ax.set_title(graafiku_nimi)
@@ -271,12 +268,21 @@ def group_single_work():
 
         ballid = [list(x) for x in zip(*ballid)]
 
+
+        kõik_ballid = []
+        for i in range(len(ballid)):
+            for e in range(len(ballid[i])):
+                ballid[i][e] = float(ballid[i][e])
+                kõik_ballid.append(ballid[i][e])
+
         ax.clear()
         ax.violinplot(ballid, showmeans=True)
         ax.set_xticks(numbrid)
         ax.set_xlabel("Ülesanned")
         ax.set_ylabel("Ballid")
-        ax.legend()
+        ax.set_yticks(numpy.arange(0, max(kõik_ballid) + 0.1, 0.1), minor=True)
+        ax.grid(b=True,which="both")
+        ax.set_axisbelow(True)
 
         graafiku_nimi = rühmanimi + ", " + töönimi
         ax.set_title(graafiku_nimi)
@@ -369,9 +375,11 @@ def group_semester():
                 f.seek(
                     0)  # Tagastab faili algusele, et seda saaks kasutada uuesti
 
+        kõik_ballid = []
         for i in range(len(ballid)):
             for e in range(len(ballid[i])):
                 ballid[i][e] = float(ballid[i][e])
+                kõik_ballid.append(ballid[i][e])
 
         for n in range(len(ballid[0])):
             numbrid.append(n + 1)
@@ -384,7 +392,9 @@ def group_semester():
         ax.set_xticks(numbrid)
         ax.set_xlabel("Tööd")
         ax.set_ylabel("Ballid")
-        ax.legend()
+        ax.set_yticks(numpy.arange(0, max(kõik_ballid) + 1, 5), minor=True)
+        ax.grid(b=True,which="both")
+        ax.set_axisbelow(True)
 
         graafiku_nimi = rühma_nimi + ", semester"
         ax.set_title(graafiku_nimi)
@@ -488,6 +498,8 @@ def course_single_work():
         ax.set_ylabel("Ballid")
         ax.violinplot(ülesanned, showmeans=True)
         ax.set_title(graafiku_nimi)
+        ax.grid(b=True,which="both")
+        ax.set_axisbelow(True)
 
         canvas.show()
         work_chooser.destroy()
@@ -582,14 +594,69 @@ def course_semester():
     graafiku_nimi = "Semester, kursus"
 
     ax.clear()
-    ax.set_yticks(numpy.arange(0, max(kõik_ballid), 1), minor=True)
+    ax.set_yticks(numpy.arange(0, max(kõik_ballid), 5), minor=True)
     ax.set_xticks(numbrid)
     ax.set_xlabel("Tööd")
     ax.set_ylabel("Ballid")
     ax.violinplot(ülesanned, showmeans=True)
     ax.set_title(graafiku_nimi)
+    ax.grid(b=True,which="both")
+    ax.set_axisbelow(True)
 
     canvas.show()
+
+
+def choose_student_mail():
+    global nimekiri
+
+    if nimekiri == []:
+        nimekiri = tudengite_nimekiri(files)
+
+    def send_mail(nimekiri_numbrid):
+
+        nimed = []
+        for e in nimekiri_numbrid:
+            nimed.append(nimekiri[e])
+
+        mails = []
+        for f in files:
+            for rida in f:
+                if rida.strip().split(",")[0] in nimed:
+                    mail = rida.strip().split(",")[1]
+                    if mail not in mails:
+                        mails.append(mail)
+            f.seek(0)
+
+        mailstring = ""
+        for i in range(len(mails)):
+            mailstring += mails[i]
+            if i != len(mails) - 1:
+                mailstring += ","
+        webbrowser.open("mailto:%s" % mailstring)
+
+    student_chooser = Tk()
+    student_chooser.title("Choose a student.")
+
+    scroll = Scrollbar(student_chooser)
+
+    options = Listbox(student_chooser, yscrollcommand=scroll.set,
+                      selectmode=MULTIPLE
+                      )
+    scroll.config(command=options.yview)
+
+    for nimi in nimekiri:
+        options.insert(END, nimi)
+
+    options.pack(side=LEFT, fill=BOTH, expand=1)
+    scroll.pack(side=LEFT, fill=Y)
+
+    select_name = Button(student_chooser, text="OK",
+                         command=lambda: send_mail(options.curselection())
+                         )
+    select_name.pack(fill=Y)
+
+    student_chooser.mainloop()
+    return None
 
 
 ################################################################################
@@ -597,7 +664,7 @@ def course_semester():
 
 
 main_window = Tk()  # Creates main application window
-main_window.title("Project")  # TODO: change main window title
+main_window.title("Teacher Assistant")  
 
 # Loob menu'riba
 main_menu = Menu(main_window)
@@ -651,14 +718,18 @@ statistics_menu.add_cascade(label="Course", menu=course_menu)
 
 # Loome message_menu
 message_menu = Menu(main_menu)
-message_menu.add_command(label="Send message", command=donothing)
+message_menu.add_command(label="Send message",
+                         command=lambda: kontrolli_failid(choose_student_mail)
+                         )
 
 main_menu.add_cascade(label="Message", menu=message_menu)
 
 # Loome graafiku objektid ja vidinad
 fig = Figure(dpi=150)
 ax = fig.add_subplot(1, 1, 1)
+ax.autoscale(enable=True, axis="y", tight=False)
 fig.set_facecolor('white')
+
 
 canvas = FigureCanvasTkAgg(fig, master=main_window)
 canvas.get_tk_widget().grid(row=0, column=0, columnspan=2, sticky=N + W + E + S)
