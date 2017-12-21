@@ -631,7 +631,7 @@ def choose_student_mail():
         for i in range(len(mails)):
             mailstring += mails[i]
             if i != len(mails) - 1:
-                mailstring += ","
+                mailstring += ";"
         webbrowser.open("mailto:%s" % mailstring)
 
     student_chooser = Tk()
