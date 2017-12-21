@@ -16,6 +16,9 @@ nimekiri = []
 tööd = []
 
 
+#TODO: check if student has not done work
+#TODO: change yscale
+
 ################################################################################
 ################################################################################
 
@@ -112,7 +115,6 @@ def student_singleWork():
         ax.set_xticks(numbrid)
         ax.set_xlabel("Ülesanned")
         ax.set_ylabel("Ballid")
-
         graafiku_nimi = inimese_nimi + ", " + töönimi
         ax.set_title(graafiku_nimi)
 
@@ -253,14 +255,24 @@ def group_single_work():
                 f.seek(
                     0)  # Tagastab faili algusele, et seda saaks kasutada uuesti
 
+
+
+        for i in range(len(ballid)):
+            for e in range(len(ballid[i])):
+                ballid[i][e] = float(ballid[i][e])
+
+
         for i in range(len(ballid[0])):
             numbrid.append(i + 1)
             for e in range(len(ballid[i])):
                 ballid[i][e] = float(ballid[i][e])
 
+
+
+        ballid = [list(x) for x in zip(*ballid)]
+
         ax.clear()
-        for i in range(len(ballid)):
-            ax.plot(numbrid, ballid[i], "o-", label=nimed[i])
+        ax.violinplot(ballid, showmeans=True)
         ax.set_xticks(numbrid)
         ax.set_xlabel("Ülesanned")
         ax.set_ylabel("Ballid")
@@ -364,9 +376,11 @@ def group_semester():
         for n in range(len(ballid[0])):
             numbrid.append(n + 1)
 
+        ballid = [list(x) for x in zip(*ballid)]
+
+
         ax.clear()
-        for i in range(len(ballid)):
-            ax.plot(numbrid, ballid[i], "o-", label=nimed[i])
+        ax.violinplot(ballid, showmeans=True)
         ax.set_xticks(numbrid)
         ax.set_xlabel("Tööd")
         ax.set_ylabel("Ballid")
@@ -642,7 +656,7 @@ message_menu.add_command(label="Send message", command=donothing)
 main_menu.add_cascade(label="Message", menu=message_menu)
 
 # Loome graafiku objektid ja vidinad
-fig = Figure(figsize=(6, 6), dpi=150)
+fig = Figure(dpi=150)
 ax = fig.add_subplot(1, 1, 1)
 fig.set_facecolor('white')
 
