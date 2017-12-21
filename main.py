@@ -3,7 +3,6 @@ from tkinter import messagebox
 from tkinter.filedialog import askopenfiles
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
-from matplotlib.pyplot import grid
 import numpy
 import webbrowser
 
@@ -108,7 +107,7 @@ def student_singleWork():
         ax.set_xticks(numbrid)
         ax.set_xlabel("Ülesanned")
         ax.set_ylabel("Ballid")
-        ax.set_yticks(numpy.arange(0, max(suurused) + 0.1, 0.1))
+        ax.set_yticks(numpy.arange(0, max(suurused) + 0.1, float(round((max(suurused)/20), 1))))
         ax.grid(b=True)
         ax.set_axisbelow(True)
 
@@ -193,7 +192,7 @@ def student_semester():
         ax.set_xticks(numbrid)
         ax.set_xlabel("Tööd")
         ax.set_ylabel("Ballid")
-        ax.set_yticks(numpy.arange(0, max(suurused), 1), minor=True)
+        ax.set_yticks(numpy.arange(0, max(suurused), float(round(max(suurused)/20, 1))), minor=True)
         ax.grid(b=True)
         ax.set_axisbelow(True)
 
@@ -280,7 +279,8 @@ def group_single_work():
         ax.set_xticks(numbrid)
         ax.set_xlabel("Ülesanned")
         ax.set_ylabel("Ballid")
-        ax.set_yticks(numpy.arange(0, max(kõik_ballid) + 0.1, 0.1), minor=True)
+        ax.set_yticks(numpy.arange(0, max(kõik_ballid) + 0.1,
+                                   (float(round(max(kõik_ballid)/20, 1)))), minor=True)
         ax.grid(b=True,which="both")
         ax.set_axisbelow(True)
 
@@ -392,7 +392,8 @@ def group_semester():
         ax.set_xticks(numbrid)
         ax.set_xlabel("Tööd")
         ax.set_ylabel("Ballid")
-        ax.set_yticks(numpy.arange(0, max(kõik_ballid) + 1, 5), minor=True)
+        ax.set_yticks(numpy.arange(0, max(kõik_ballid) + 1,
+                                   (float(round(max(kõik_ballid) / 20, 1)))), minor=True)
         ax.grid(b=True,which="both")
         ax.set_axisbelow(True)
 
@@ -492,7 +493,8 @@ def course_single_work():
         graafiku_nimi = töönimi.capitalize() + ", kursus"
 
         ax.clear()
-        ax.set_yticks(numpy.arange(0, len(kõik_ballid), 0.1))
+        ax.set_yticks(numpy.arange(0, len(kõik_ballid),
+                                   (float(round(max(kõik_ballid) / 20, 1)))))
         ax.set_xticks(numbrid)
         ax.set_xlabel("Ülesanned")
         ax.set_ylabel("Ballid")
@@ -594,7 +596,8 @@ def course_semester():
     graafiku_nimi = "Semester, kursus"
 
     ax.clear()
-    ax.set_yticks(numpy.arange(0, max(kõik_ballid), 5), minor=True)
+    ax.set_yticks(numpy.arange(0, max(kõik_ballid),
+                               (float(round(max(kõik_ballid) / 20,1)))), minor=True)
     ax.set_xticks(numbrid)
     ax.set_xlabel("Tööd")
     ax.set_ylabel("Ballid")
