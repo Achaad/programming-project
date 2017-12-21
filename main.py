@@ -664,7 +664,7 @@ def choose_student_mail():
 
 
 main_window = Tk()  # Creates main application window
-main_window.title("Teacher Assistant")  
+main_window.title("Teacher Assistant")
 
 # Loob menu'riba
 main_menu = Menu(main_window)
